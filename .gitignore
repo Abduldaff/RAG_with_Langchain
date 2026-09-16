@@ -1,0 +1,13 @@
+@"
+.rag311/
+venv/
+.venv/
+env/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.env
+.ipynb_checkpoints/
+.vscode/
+"@ | Set-Content .gitignore

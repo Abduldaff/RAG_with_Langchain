@@ -1,0 +1,20 @@
+python programming Introduction
+    Python is a high-level, general-purpose programming language that has become one of the most popular languages in the world due to its simplicity and readability. 
+    Created by Guido van Rossum and released in 1991, Python is designed to look much like the English language, making it an ideal choice for absolute beginners. [1] (https://www.w3schools.com/python/python_intro.asp), 
+    [2] (https://www.geeksforgeeks.org/python/introduction-to-python/), 
+    [3] (https://en.wikipedia.org/wiki/Python_(programming_language)), 
+    [4] (https://www.youtube.com/watch?v=K5KVEU3aaeQ&t=1), 
+    [5] (https://www.tutorialspoint.com/python/python_overview.htm)
+    Key Features of PythonReadability: 
+    Python uses clean formatting and relies on whitespace indentation instead of curly braces {} or semicolons to define blocks of code.
+      [1] (https://www.geeksforgeeks.org/python/introduction-to-python/), 
+      [2] (https://en.wikipedia.org/wiki/Python_(programming_language))Interpreted Language: Code is executed line-by-line as soon as it is written, allowing for rapid testing and prototyping. 
+      [1] (https://www.w3schools.com/python/python_intro.asp), 
+      [2] (https://www.tutorialspoint.com/python/python_overview.htm)
+      Versatile Paradigms: It supports multiple programming styles, including procedural, object-oriented, and functional programming. 
+      [1] (https://www.w3schools.com/python/python_intro.asp),
+        [2] (https://www.geeksforgeeks.org/python/introduction-to-python/)
+        Massive Ecosystem: Python comes with a "batteries-included" standard library and hundreds of thousands of third-party packages for almost any task. 
+        [1] (https://www.youtube.com/watch?v=K5KVEU3aaeQ&t=1), 
+        [2] (https://en.wikipedia.org/wiki/Python_(programming_language))
+    
