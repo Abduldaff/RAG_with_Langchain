@@ -1,103 +1,216 @@
-# Local RAG Project
+# Local RAG Project for Learning
 
-This project is a lightweight Retrieval-Augmented Generation (RAG) example built around local documents. It demonstrates how to ingest PDF and text files, split the content into smaller chunks, generate embeddings, and store them in a persistent vector database for retrieval-based querying.
+This repository is a hands-on learning project for building a Retrieval-Augmented Generation (RAG) system using local documents. The goal is to understand the core workflow of RAG step by step:
 
-The workflow is implemented in Jupyter notebooks and uses a local Chroma vector store so the project can run without requiring an external hosted service.
+- load knowledge from files,
+- split large documents into chunks,
+- convert chunks into embeddings,
+- store them in a vector index,
+- retrieve relevant context for a query,
+- pass that context to an LLM for final answer generation.
 
-## What this project does
+This project is intentionally simple and educational. It focuses on understanding the mechanics of RAG rather than building a production-ready enterprise system.
 
-- Loads files from the local `data/` directory
-- Supports both PDF and plain-text sources
-- Splits large documents into manageable chunks
-- Generates embeddings using `sentence-transformers`
-- Stores embeddings in a persistent Chroma database
-- Provides a notebook-based environment for experimenting with RAG workflows
+## Why this project exists
+
+The purpose of this repository is to help learn how a RAG pipeline works in practice. It demonstrates:
+
+- document ingestion from local files,
+- chunking strategy for long-form content,
+- embedding generation using a sentence-transformer model,
+- vector search with FAISS,
+- retrieval of the most relevant chunks,
+- summarization using a Groq-hosted LLM.
+
+## Main learning workflow
+
+The system follows this pipeline:
+
+1. Read files from the `data` folder.
+2. Detect supported file types like PDF and text.
+3. Convert each file into LangChain documents.
+4. Split the content into smaller chunks.
+5. Generate embeddings for each chunk.
+6. Store those embeddings in a FAISS index.
+7. Search the index for the most relevant content for a user question.
+8. Use the retrieved text as context for a final LLM response.
 
 ## Project structure
 
-- `data/`
-  - `pdf/` - PDF documents for ingestion
-  - `text_file/` - Text-based documents, including sample Python content
-  - `vector_store/` - persistent Chroma database files
-- `notebook/`
-  - `document.ipynb` - basic document loading and text ingestion examples
-  - `pdf_loader.ipynb` - end-to-end RAG pipeline: loading PDFs, chunking, embeddings, and vector storage
-- `requirements.txt` - Python dependencies for the project
-- `.rag311/` - local virtual environment directory for the project
-
-## Main workflow
-
-The project follows this pipeline:
-
-1. Load documents from a directory or file
-2. Clean and normalize content from PDFs/text files
-3. Split documents into chunks using `RecursiveCharacterTextSplitter`
-4. Generate embeddings with a SentenceTransformer model
-5. Store the chunks and embeddings in a Chroma collection
-6. Retrieve relevant chunks for a query and use them as context for downstream generation tasks
+```text
+RAG/
+├── app.py                     # Main entry point for the local RAG pipeline
+├── README.md                 # Project documentation
+├── requirements.txt          # Python dependencies
+├── data/
+│   ├── pdf/                  # PDF files for retrieval
+│   ├── text_file/            # Text files and sample documents
+│   └── vector_store/         # Local vector database files (if used)
+├── faiss_store/
+│   ├── faiss.index           # FAISS vector index
+│   └── metadata.pkl          # Metadata linked to index entries
+├── notebook/
+│   ├── document.ipynb        # Learning notebook
+│   └── pdf_loader.ipynb      # PDF ingestion and vector-building examples
+├── src/
+│   ├── __init__.py
+│   ├── data_loader.py        # File loading logic
+│   ├── embedding.py          # Embedding generation and chunking pipeline
+│   ├── search.py             # Query + retrieval + LLM summarization flow
+│   └── vectorstore.py        # FAISS vector store implementation
+└── .env.example              # Optional example env file (if present in your setup)
+```
 
 ## Technologies used
 
+This project combines a few important tools commonly used in RAG systems:
+
 - Python
-- LangChain and LangChain Community loaders
-- `langchain-text-splitters`
-- `sentence-transformers`
-- `chromadb`
-- NumPy and scikit-learn utilities
-- Jupyter notebooks
+- LangChain and LangChain Community
+- FAISS for vector search
+- SentenceTransformers for embeddings
+- Groq for the language model layer
+- Pandas / NumPy utilities in supporting scripts
+- Jupyter notebooks for experiments
 
 ## Setup
 
-From the project root, create and activate a virtual environment if needed, then install dependencies:
+### 1. Create a virtual environment
+
+On Windows:
+
+```bash
+python -m venv .venv
+.\.venv\Scripts\activate
+```
+
+On macOS/Linux:
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+```
+
+### 2. Install dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-If you are using the included local environment folder, you can also activate it directly from the project root:
+### 3. Add your LLM API key
 
-```bash
-.\.rag311\Scripts\activate
+This project uses Groq for the final answer generation step. Create a `.env` file in the project root and add your key.
+
+```env
+GROQ_API_KEY=your_key_here
 ```
 
-## Run the notebooks
+If you are following the project as an exercise, this is the place where you can understand how an external LLM is connected to the retrieval pipeline.
 
-Start Jupyter from the project root:
+## How to run the project
+
+From the project root, run:
 
 ```bash
-jupyter notebook
+python app.py
 ```
 
-Then open the notebooks inside `notebook/` and run the cells in order.
+This script:
 
-## Data placement
+- loads documents from the `data` folder,
+- builds or loads the FAISS index,
+- runs a sample question,
+- retrieves relevant chunks,
+- summarizes the answer with the LLM.
 
-Place your source data in one of these folders:
+## Data folder
 
-- `data/pdf/` for PDF files
-- `data/text_file/` for text files
+Place your source documents in the `data` folder. This project is designed to support multiple file types, such as:
 
-The vector database is stored under:
+- PDF files in `data/pdf/`
+- text files in `data/text_file/`
+- additional formats if supported by the loaders
 
-- `data/vector_store/`
+When new files are added, the indexing step should be refreshed so the new content appears in search results.
 
-## Notes
+## Understanding the code
 
-- This project is designed for experimentation and learning rather than production deployment.
-- Chroma persists its collection locally, so the database remains available between notebook runs.
-- If you add new documents, re-run the ingestion and embedding steps to include them in the vector store.
-- Some model downloads may happen automatically when the embedding model is first initialized.
+### `src/data_loader.py`
+
+This module loads files from the local filesystem and converts them into LangChain documents. The idea is to standardize the input format before embedding and searching.
+
+### `src/embedding.py`
+
+This file handles the chunking and embedding process. It converts document text into numerical vectors that can be compared semantically during retrieval.
+
+### `src/vectorstore.py`
+
+This is the vector search layer. It stores every chunk in a FAISS index, allowing the system to perform similarity search on the user query.
+
+### `src/search.py`
+
+This is where the workflow becomes a true RAG pipeline:
+
+- embed the query,
+- find similar chunks,
+- collect relevant context,
+- send that context to the LLM for answer generation.
+
+### `app.py`
+
+This file acts as the main pipeline runner. It wires everything together and demonstrates the end-to-end behavior.
+
+## Learning goals for this project
+
+This repo is best used to learn these RAG concepts:
+
+- retrieval over local knowledge bases,
+- semantic similarity search,
+- chunking and context selection,
+- embedding pipelines,
+- combining document retrieval with LLM reasoning,
+- building a simple local prototype before scaling to production.
 
 ## Example use case
 
-A common workflow in this repository is:
+You can ask questions like:
 
-1. Add a PDF or text file to `data/`
-2. Load and split the document in the notebook
-3. Generate embeddings
-4. Save the vectors to the local Chroma store
-5. Use the stored chunks as retrieval context for a RAG answer
+```text
+What is the case of Siddharth Dalmia vs Union of India about?
+```
+
+The pipeline will:
+
+- pull relevant documents from the vector index,
+- select the most relevant chunks,
+- build a context window,
+- summarize the answer using the LLM.
+
+## Important notes
+
+- This project is meant for learning and experimentation.
+- It is not optimized for production deployment or enterprise scale.
+- Large documents may require better chunking and metadata strategies.
+- Embedding models and LLMs may require internet access for the first download.
+- Re-indexing is needed when new documents are added.
+
+## Suggested next improvements
+
+As you learn more, you can extend this project by adding:
+
+- a better prompt template,
+- metadata-aware filtering,
+- a web UI with Streamlit or Gradio,
+- support for more document formats,
+- hybrid search (
+  keyword + semantic search),
+- logging and evaluation of retrieval quality,
+- a more robust production-ready architecture.
 
 ## License
 
 This project is intended for educational and experimental use.
+
+## Summary
+
+This repository is a practical introduction to RAG. It gives you a working example of how a local knowledge base can be searched, retrieved, and used to answer questions with the help of an LLM. The best way to learn from it is to read through the files, run it locally, and experiment with different documents, chunk sizes, and query types.
